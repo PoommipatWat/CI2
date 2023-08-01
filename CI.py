@@ -1,8 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import time
 import copy
-
 
 class NN:
     def __init__(self, layer, learning_rate = 0.1, momentum_rate=0.9):
