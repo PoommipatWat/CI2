@@ -2,6 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import copy
 
+### README ###
+# 1. ต้องติดตั้ง library numpy, matplotlib ก่อนใช้งาน (pip install numpy, pip install matplotlib)
+# 2. ต้องมีไฟล์ Flood_dataset.txt อยู่ในโฟลเดอร์เดียวกันกับไฟล์นี้
+# 3. แก้ไข parameter ได้ที่บรรทัด 153 และ 159
+###
+
 class NN:
     def __init__(self, layer, learning_rate = 0.1, momentum_rate=0.9, activation_function='sigmoid'):
         self.w, self.delta_w = self.init_weights_dw(layer)
@@ -144,9 +150,10 @@ def k_fold_varidation(data, k = 10):
 
 if __name__ == "__main__":
     # เตรียมข้อมูล
+    k = 10 # กำหนด k-fold
     input, design_output = Read_Data()
-    input_train, input_test = k_fold_varidation(input)
-    design_output_train, design_output_test = k_fold_varidation(design_output)
+    input_train, input_test = k_fold_varidation(input, k)
+    design_output_train, design_output_test = k_fold_varidation(design_output, k)
 
     # สร้างต้นฉบับ NN
     nn = NN([8, 16, 1], learning_rate=0.3, momentum_rate=0.8, activation_function='sigmoid') # activation_function = 'sigmoid' or 'relu' or 'tanh' or 'linear'
