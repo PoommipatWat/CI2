@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import copy
 
 class NN:
-    def __init__(self, layer, learning_rate = 0.1, momentum_rate=0.9):
+    def __init__(self, layer, learning_rate = 0.1, momentum_rate=0.9, activation_function='sigmoid'):
         self.w, self.delta_w = self.init_weights_dw(layer)
         self.b, self.delta_bias, self.local_gradient = self.init_bias_lg(layer)
     
@@ -14,10 +14,22 @@ class NN:
         self.momentum_rate = momentum_rate
         self.learning_rate = learning_rate
 
-    def sigmoid(self, x):
-        return 1 / (1 + np.exp(-x))
-    def sigmoid_diff(self, x):
-        return x * (1 - x)
+        self.activation_function = activation_function
+
+    def activation(self, x):
+        if self.activation_function == "sigmoid":
+            return 1 / (1 + np.exp(-x))
+        elif self.activation_function == "relu":
+            return np.maximum(0, x)
+        elif self.activation_function == "tanh":
+            return np.tanh(x)
+    def activation_diff(self, x):
+        if self.activation_function == "sigmoid":
+            return x * (1 - x)
+        elif self.activation_function == "relu":
+            return np.where(x > 0, 1.0, 0.0)
+        elif self.activation_function == "tanh":
+            return 1 - x**2
 
     def init_weights_dw(self, layer):
         weights = []
@@ -40,15 +52,15 @@ class NN:
     def feed_forward(self, input):
         self.V = [input]
         for i in range(len(self.layer) - 1):
-            self.V.append(self.sigmoid(np.dot(self.w[i],self.V[i]) + self.b[i]))
+            self.V.append(self.activation(np.dot(self.w[i],self.V[i]) + self.b[i]))
 
     def back_propagation(self, design_output):
         for i, j in enumerate(reversed(range(1, len(self.layer), 1))):
             if i == 0:
                 error = design_output - self.V[j]
-                self.local_gradient[j] = error * self.sigmoid_diff(self.V[j])
+                self.local_gradient[j] = error * self.activation_diff(self.V[j])
             else:
-                self.local_gradient[j] = self.sigmoid_diff(self.V[j]) * np.sum(self.w[j] * self.local_gradient[j+1])
+                self.local_gradient[j] = self.activation_diff(self.V[j]) * np.sum(self.w[j] * self.local_gradient[j+1])
             self.delta_w[j-1] = (self.momentum_rate * self.delta_w[j-1]) + np.outer(self.learning_rate * self.local_gradient[j], self.V[j-1])
             self.delta_bias[j-1] = (self.momentum_rate * self.delta_bias[j-1]) + self.learning_rate * self.local_gradient[j]
             self.w[j-1] += self.delta_w[j-1]
@@ -133,11 +145,12 @@ if __name__ == "__main__":
     design_output_train, design_output_test = k_fold_varidation(design_output)
 
     # สร้างต้นฉบับ NN
-    nn = NN([8, 16, 1], learning_rate=0.3, momentum_rate=0.8)
+    nn = NN([8, 16, 1], learning_rate=0.3, momentum_rate=0.8, activation_function='sigmoid') # activation_function = 'sigmoid' or 'relu' or 'tanh'
 
+    # ทดสอบโมเดลแบบ cross validation
     for i in range(len(input_train)):
         nn_copy = copy.deepcopy(nn)
-        nn_copy.train(input_train[i], design_output_train[i], Epoch=500)
+        nn_copy.train(input_train[i], design_output_train[i], Epoch=5000)
         nn_copy.test(input_test[i], design_output_test[i])
 
 
