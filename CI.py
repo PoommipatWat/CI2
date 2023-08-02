@@ -23,6 +23,8 @@ class NN:
             return np.maximum(0, x)
         elif self.activation_function == "tanh":
             return np.tanh(x)
+        elif self.activation_function == "linear":
+            return x
     def activation_diff(self, x):
         if self.activation_function == "sigmoid":
             return x * (1 - x)
@@ -30,6 +32,8 @@ class NN:
             return np.where(x > 0, 1.0, 0.0)
         elif self.activation_function == "tanh":
             return 1 - x**2
+        elif self.activation_function == "linear":
+            return np.ones_like(x)
 
     def init_weights_dw(self, layer):
         weights = []
@@ -145,7 +149,7 @@ if __name__ == "__main__":
     design_output_train, design_output_test = k_fold_varidation(design_output)
 
     # สร้างต้นฉบับ NN
-    nn = NN([8, 16, 1], learning_rate=0.3, momentum_rate=0.8, activation_function='sigmoid') # activation_function = 'sigmoid' or 'relu' or 'tanh'
+    nn = NN([8, 16, 1], learning_rate=0.3, momentum_rate=0.8, activation_function='sigmoid') # activation_function = 'sigmoid' or 'relu' or 'tanh' or 'linear'
 
     # ทดสอบโมเดลแบบ cross validation
     for i in range(len(input_train)):
