@@ -5,22 +5,19 @@ import copy
 ### README ###
 # 1. ต้องติดตั้ง library numpy, matplotlib ก่อนใช้งาน (pip install numpy, pip install matplotlib)
 # 2. ต้องมีไฟล์ Flood_dataset.txt อยู่ในโฟลเดอร์เดียวกันกับไฟล์นี้
-# 3. แก้ไข parameter ได้ที่บรรทัด 153 และ 159
+# 3. แก้ไข parameter ได้ที่บรรทัด 149 และ 155
 ###
 
 class NN:
     def __init__(self, layer, learning_rate = 0.1, momentum_rate=0.9, activation_function='sigmoid'):
-        self.w, self.delta_w = self.init_weights_dw(layer)
-        self.b, self.delta_bias, self.local_gradient = self.init_bias_lg(layer)
-    
-        self.layer = layer
 
         self.V = []
-
+        self.layer = layer
         self.momentum_rate = momentum_rate
         self.learning_rate = learning_rate
-
         self.activation_function = activation_function
+
+        self.w, self.delta_w, self.b, self.delta_bias, self.local_gradient = self.init_inform(layer)
 
     def activation(self, x):
         if self.activation_function == "sigmoid":
@@ -41,24 +38,20 @@ class NN:
         elif self.activation_function == "linear":
             return np.ones_like(x)
 
-    def init_weights_dw(self, layer):
+    def init_inform(self, layer):
         weights = []
         delta_weights = []
-        for i in range(1, len(layer), 1):
-            weights.append(np.random.rand(layer[i], layer[i-1]))
-            delta_weights.append(np.zeros((layer[i], layer[i-1])))
-        return weights, delta_weights
-
-    def init_bias_lg(self, layer):
         biases = []
         delta_biases = []
         local_gradientes = [np.zeros(layer[0])]
         for i in range(1, len(layer), 1):
+            weights.append(np.random.rand(layer[i], layer[i-1]))
+            delta_weights.append(np.zeros((layer[i], layer[i-1])))
             biases.append(np.random.rand(layer[i]))
             delta_biases.append(np.zeros(layer[i]))
             local_gradientes.append(np.zeros(layer[i]))
-        return biases, delta_biases, local_gradientes
-
+        return weights, delta_weights, biases, delta_biases, local_gradientes
+    
     def feed_forward(self, input):
         self.V = [input]
         for i in range(len(self.layer) - 1):
@@ -164,7 +157,7 @@ if __name__ == "__main__":
     # ทดสอบโมเดลแบบ cross validation
     for i in range(len(input_train)):
         nn_copy = copy.deepcopy(nn)
-        nn_copy.train(input_train[i], design_output_train[i], Epoch=500)
+        nn_copy.train(input_train[i], design_output_train[i], Epoch=500000)
         nn_copy.test(input_test[i], design_output_test[i])
 
 
