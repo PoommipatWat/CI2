@@ -196,7 +196,7 @@ if __name__ == "__main__":
 
     # ทดสอบโมเดลแบบ cross validation
     for i in range(len(input_train)):
-        # nn_copy = copy.deepcopy(nn)
+        nn_copy = copy.deepcopy(nn)
         nn_copy = nn
         nn_copy.train(input_train[i], design_output_train[i], Epoch=Max_Epoch, L_error=AV_error)
         nn_copy.test(input_test[i], design_output_test[i], type=data_type)
