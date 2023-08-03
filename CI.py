@@ -80,7 +80,7 @@ class NN:
             keep_error.append(er)
             N += 1
             print(f"Epoch = {N} | AV_Error = {er}")
-        plt.subplot(1, 2, 1)
+        plt.subplot(2, 1, 1)
         plt.plot(keep_error)
         plt.title('MSE vs. Epoch of TrainSet')
         plt.xlabel('Epoch')
@@ -112,7 +112,7 @@ class NN:
         print(f"Test_error = {er}")
         bar_width = 0.2
         index = range(len(categories))
-        plt.subplot(1, 2, 2)
+        plt.subplot(2, 1, 2)
         plt.bar(index, np.array(actual_output), bar_width, label='Actual Output', color='b')
         plt.bar([i + bar_width for i in index], np.array(design_output), bar_width, label='Design Output', color='orange')
         plt.bar([j + bar_width for j in [i + bar_width for i in index]], np.array([100 if abs(actual_output[i]-design_output[i])>100 else abs(actual_output[i]-design_output[i]) for i in range(len(actual_output))]), bar_width, label='Error', color='r')
@@ -175,8 +175,8 @@ def k_fold_varidation(data, k = 10):
 
 if __name__ == "__main__":
     
-##------------------------------------ Parameter Input ------------------------------------##
-    k = 10 # กำหนด k-fold
+##------------------------------------ สำหรับแก้ไขค่าต่างๆ ------------------------------------##
+    k = 10 # กำหนด k-fold-varidation
     layer = {"regression":[8,16,1], "classification":[2,16,2]}  # [input, hidden, output] โดย hidden สร้างได้หลาย layer เช่น [2,16,16,2]
     learning_rate = 0.3
     momentum_rate = 0.8
@@ -184,7 +184,7 @@ if __name__ == "__main__":
     AV_error = 0.001
     activation_function = 'sigmoid' # activation_function = 'sigmoid' or 'relu' or 'tanh' or 'linear'
     data_type = "classification" # data_type = "regression" or "classification
-##------------------------------------ Parameter Input ------------------------------------##
+##-----------------------------------------------------------------------------------------##
 
     #  ทำ k-fold
     input, design_output = Read_Data(data_type)
@@ -197,9 +197,5 @@ if __name__ == "__main__":
     # ทดสอบโมเดลแบบ cross validation
     for i in range(len(input_train)):
         nn_copy = copy.deepcopy(nn)
-        nn_copy = nn
         nn_copy.train(input_train[i], design_output_train[i], Epoch=Max_Epoch, L_error=AV_error)
         nn_copy.test(input_test[i], design_output_test[i], type=data_type)
-
-
-
