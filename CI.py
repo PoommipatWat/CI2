@@ -5,7 +5,7 @@ import copy
 ### README ###
 # 1. ต้องติดตั้ง library numpy, matplotlib ก่อนใช้งาน (pip install numpy, pip install matplotlib)
 # 2. ต้องมีไฟล์ Flood_dataset.txt อยู่ในโฟลเดอร์เดียวกันกับไฟล์นี้
-# 3. แก้ไข parameter ได้ที่บรรทัด 149 และ 155
+# 3. แก้ไข parameter ได้ที่บรรทัด 168 และ 175
 ###
 
 class NN:
