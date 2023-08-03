@@ -63,14 +63,15 @@ class NN:
                 error = design_output - self.V[j]
                 self.local_gradient[j] = error * self.activation_diff(self.V[j])
             else:
-                self.local_gradient[j] = self.activation_diff(self.V[j]) * np.sum(self.w[j] * self.local_gradient[j+1])
+                # self.local_gradient[j] = self.activation_diff(self.V[j]) * (self.w[j] @ self.local_gradient[j+1])
+                self.local_gradient[j] = self.activation_diff(self.V[j]) * np.sum(np.outer(self.w[j], self.local_gradient[j+1]))
             self.delta_w[j-1] = (self.momentum_rate * self.delta_w[j-1]) + np.outer(self.learning_rate * self.local_gradient[j], self.V[j-1])
             self.delta_bias[j-1] = (self.momentum_rate * self.delta_bias[j-1]) + self.learning_rate * self.local_gradient[j]
             self.w[j-1] += self.delta_w[j-1]
             self.b[j-1] += self.delta_bias[j-1]
         return np.sum(error**2) / 2 #return SSE
     
-    def train(self, input, design_output, Epoch = 1000, L_error = 0.001):
+    def train(self, input, design_output, Epoch = 1000000, L_error = 0.001):
         N = 0
         keep_error = []
         
@@ -98,25 +99,26 @@ class NN:
             self.feed_forward(i)
             actual_output.append(self.V[-1])
         actual_output = [element[0] for element in actual_output]
+        actual_output2 = [element[1] for element in actual_output]
         categories = [f"{element}" for element in range(len(design_output))]
         er = 0
         for i in range(len(actual_output)):
             er += np.sum((actual_output[i]-design_output[i])**2) / 2
         er /= len(actual_output)
         print(f"Test_error = {er}")
-        bar_width = 0.2
-        index = range(len(categories))
-        # plt.subplot(1, 2, 2)
-        plt.bar(index, np.array(actual_output), bar_width, label='Actual Output', color='b')
-        plt.bar([i + bar_width for i in index], np.array(design_output), bar_width, label='Design Output', color='orange')
-        plt.bar([j + bar_width for j in [i + bar_width for i in index]], np.array([100 if abs(actual_output[i]-design_output[i])>100 else abs(actual_output[i]-design_output[i]) for i in range(len(actual_output))]), bar_width, label='Error', color='r')
-        plt.xlabel('Sample')
-        plt.ylabel('Output')
-        plt.title('Actual Output vs. Design Output of TestSet')
-        plt.xticks([i + bar_width / 2 for i in index], categories)
-        plt.legend()
-        plt.tight_layout()
-        plt.show()
+        # bar_width = 0.2
+        # index = range(len(categories))
+        # # plt.subplot(1, 2, 2)
+        # plt.bar(index, np.array(actual_output), bar_width, label='Actual Output', color='b')
+        # plt.bar([i + bar_width for i in index], np.array(design_output), bar_width, label='Design Output', color='orange')
+        # plt.bar([j + bar_width for j in [i + bar_width for i in index]], np.array([100 if abs(actual_output[i]-design_output[i])>100 else abs(actual_output[i]-design_output[i]) for i in range(len(actual_output))]), bar_width, label='Error', color='r')
+        # plt.xlabel('Sample')
+        # plt.ylabel('Output')
+        # plt.title('Actual Output vs. Design Output of TestSet')
+        # plt.xticks([i + bar_width / 2 for i in index], categories)
+        # plt.legend()
+        # plt.tight_layout()
+        # plt.show()
                 
 def Read_Data(filename = 'Flood_dataset.txt'):
     data = []
@@ -133,7 +135,24 @@ def Read_Data(filename = 'Flood_dataset.txt'):
     data = (data - min_vals) / (max_vals - min_vals + epsilon)
     for i in data:
         input.append(i[:-1])
-        design_output.append(i[-1])
+        design_output.append(np.array(i[-1]))
+    return input, design_output
+
+def Read_Data2(filename = 'cross.txt'):
+    data = []
+    input = []
+    design_output = []
+    with open(filename) as f:
+        a = f.readlines()
+        for line in range(1, len(a), 3):
+            z = np.array([float(element) for element in a[line][:-2].split()])
+            zz = np.array([float(element) for element in a[line+1].split()])
+            data.append(np.append(z, zz))
+    data = np.array(data)
+    np.random.shuffle(data)
+    for i in data:
+        input.append(i[:-2])
+        design_output.append(i[-2:])
     return input, design_output
 
 def k_fold_varidation(data, k = 10):
@@ -147,18 +166,19 @@ def k_fold_varidation(data, k = 10):
 if __name__ == "__main__":
     # เตรียมข้อมูล
     k = 10 # กำหนด k-fold
-    input, design_output = Read_Data()
+    input, design_output = Read_Data2()
     input_train, input_test = k_fold_varidation(input, k)
     design_output_train, design_output_test = k_fold_varidation(design_output, k)
 
     # สร้างต้นฉบับ NN
-    nn = NN([8, 16, 1], learning_rate=0.3, momentum_rate=0.8, activation_function='sigmoid') # activation_function = 'sigmoid' or 'relu' or 'tanh' or 'linear'
+    nn = NN([2, 16, 2], learning_rate=0.1, momentum_rate=0.3, activation_function='sigmoid') # activation_function = 'sigmoid' or 'relu' or 'tanh' or 'linear'
 
     # ทดสอบโมเดลแบบ cross validation
     for i in range(len(input_train)):
         nn_copy = copy.deepcopy(nn)
-        nn_copy.train(input_train[i], design_output_train[i], Epoch=500000)
+        nn_copy.train(input_train[i], design_output_train[i], Epoch=1000)
         nn_copy.test(input_test[i], design_output_test[i])
+        break
 
 
 
