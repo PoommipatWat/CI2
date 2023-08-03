@@ -2,6 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import copy
 
+<<<<<<< HEAD
+=======
+### README ###
+# 1. ต้องติดตั้ง library numpy, matplotlib ก่อนใช้งาน (pip install numpy, pip install matplotlib)
+# 2. ต้องมีไฟล์ Flood_dataset.txt อยู่ในโฟลเดอร์เดียวกันกับไฟล์นี้
+# 3. แก้ไข parameter ได้ที่บรรทัด 168 และ 175
+###
+
+>>>>>>> 084263f3cf8e8800fed26e184068ccd94e2c8ec6
 class NN:
     def __init__(self, layer, learning_rate = 0.1, momentum_rate=0.9, activation_function='sigmoid'):
 
