@@ -122,6 +122,7 @@ class NN:
         plt.legend()
                     
 
+
 def Read_Data(data_type = "regression"):
     if data_type == "regression":
         return Read_Data1()
@@ -178,12 +179,35 @@ if __name__ == "__main__":
     layer = {"regression":[8,16,1], "classification":[2,16,2]}  # [input, hidden, output] โดย hidden สร้างได้หลาย layer เช่น [2,16,16,2]
     learning_rate = 0.3
     momentum_rate = 0.8
-    Max_Epoch = 100
+    Max_Epoch = 1000
     AV_error = 0.001
     activation_function = 'sigmoid' # activation_function = 'sigmoid' or 'relu' or 'tanh' or 'linear'
     data_type = "classification" # data_type = "regression" or "classification
 ##-----------------------------------------------------------------------------------------##
 
+    if input("Do you want to change the default value? (y/n): ").lower() == "n":
+        in_k = input("Enter k-fold-varidation: ")
+        k = int(in_k) if in_k != "" else k
+        learning_rate_k = input("Enter learning rate: ")
+        learning_rate = float(learning_rate_k) if learning_rate_k != "" else learning_rate
+        momentum_rate_k = input("Enter momentum rate: ")
+        momentum_rate = float(momentum_rate_k) if momentum_rate_k != "" else momentum_rate
+        Max_Epoch_k = input("Enter Max Epoch: ")
+        Max_Epoch = int(Max_Epoch_k) if Max_Epoch_k != "" else Max_Epoch
+        AV_error_k = input("Enter AV error: ")
+        AV_error = float(AV_error_k) if AV_error_k != "" else AV_error
+        data_type = input("Enter data type: ")
+        if data_type != "regression" and data_type != "classification":
+            data_type = "classification"
+
+    print(f"k-fold-varidation = {k}")
+    print(f"learning rate = {learning_rate}")
+    print(f"momentum rate = {momentum_rate}")
+    print(f"Max Epoch = {Max_Epoch}")
+    print(f"AV error = {AV_error}")
+    print(f"data type = {data_type}")
+    
+        
     #  ทำ k-fold
     input, design_output = Read_Data(data_type)
     input_train, input_test = k_fold_varidation(input, k)
@@ -193,7 +217,7 @@ if __name__ == "__main__":
     nn = NN(layer[data_type], learning_rate, momentum_rate, activation_function) 
 
     # ทดสอบโมเดลแบบ cross validation
-    for i in range(2):
+    for i in range(len(input_train)):
         plt.figure(i+1)
         nn_copy = copy.deepcopy(nn)
         nn_copy.train(input_train[i], design_output_train[i], Epoch=Max_Epoch, L_error=AV_error)
