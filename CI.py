@@ -101,7 +101,7 @@ class NN:
             for i in range(len(actual_output)):
                 if actual_output[i] == design_output[i]:
                     kk += 1
-            print(f"Accuracy = {kk*100/len(actual_output)}%")
+            # print(f"Accuracy = {kk*100/len(actual_output)}%")
         else:
             actual_output = [element[0] for element in actual_output]
         categories = [f"{element}" for element in range(len(design_output))]
@@ -109,7 +109,6 @@ class NN:
         for i in range(len(actual_output)):
             er += np.sum((actual_output[i]-design_output[i])**2) / 2
         er /= len(actual_output)
-        print(f"Test_error = {er}")
         bar_width = 0.2
         index = range(len(categories))
         plt.subplot(2, 1, 2)
@@ -121,8 +120,7 @@ class NN:
         plt.title('Actual Output vs. Design Output of TestSet')
         plt.xticks([i + bar_width / 2 for i in index], categories)
         plt.legend()
-        plt.tight_layout()
-        plt.show()                
+                    
 
 def Read_Data(data_type = "regression"):
     if data_type == "regression":
@@ -180,7 +178,7 @@ if __name__ == "__main__":
     layer = {"regression":[8,16,1], "classification":[2,16,2]}  # [input, hidden, output] โดย hidden สร้างได้หลาย layer เช่น [2,16,16,2]
     learning_rate = 0.3
     momentum_rate = 0.8
-    Max_Epoch = 1000
+    Max_Epoch = 100
     AV_error = 0.001
     activation_function = 'sigmoid' # activation_function = 'sigmoid' or 'relu' or 'tanh' or 'linear'
     data_type = "classification" # data_type = "regression" or "classification
@@ -195,7 +193,9 @@ if __name__ == "__main__":
     nn = NN(layer[data_type], learning_rate, momentum_rate, activation_function) 
 
     # ทดสอบโมเดลแบบ cross validation
-    for i in range(len(input_train)):
+    for i in range(2):
+        plt.figure(i+1)
         nn_copy = copy.deepcopy(nn)
         nn_copy.train(input_train[i], design_output_train[i], Epoch=Max_Epoch, L_error=AV_error)
         nn_copy.test(input_test[i], design_output_test[i], type=data_type)
+    plt.show()    
